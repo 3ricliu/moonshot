@@ -11,11 +11,12 @@ import SwiftUI
 struct ContentView: View {
   let astronauts: [Astronaut] = Bundle.main.decode("astronauts.json")
   let missions: [Mission] = Bundle.main.decode("missions.json")
+  @State private var showingAstronauts = false
   
   var body: some View {
     NavigationView {
       List(missions) { mission in
-        NavigationLink(destination: MissionView(mission: mission, astronauts: astronauts)) {
+        NavigationLink(destination: MissionView(mission: mission, astronauts: astronauts, missions: missions)) {
           Image(mission.image)
             .resizable()
             .scaledToFit()
@@ -24,11 +25,27 @@ struct ContentView: View {
           VStack(alignment: .leading) {
             Text(mission.displayName)
               .font(.headline)
-            Text(mission.formattedLaunchDate)
+            Text(self.getDetails(mission))
           }
         }
       }
       .navigationBarTitle("Moonshot")
+      .navigationBarItems(trailing: Button("Details") {
+        self.toggleAstronauts()
+      })
+    }
+  }
+  
+  func toggleAstronauts() {
+    print("hello")
+    self.showingAstronauts.toggle()
+  }
+  
+  func getDetails(_ mission: Mission) -> String {
+    if showingAstronauts {
+      return mission.crewNames
+    } else {
+      return mission.formattedLaunchDate
     }
   }
 }

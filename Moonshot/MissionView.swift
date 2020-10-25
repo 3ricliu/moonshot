@@ -15,6 +15,7 @@ struct MissionView: View {
 
   let mission: Mission
   let astronauts: [CrewMember]
+  let missions: [Mission]
   
   var body: some View {
     GeometryReader { geometry in
@@ -26,12 +27,13 @@ struct MissionView: View {
             .frame(maxWidth: geometry.size.width * 0.7)
             .padding(.top)
 
+          Text("Launch Date: \(formattedLaunchDate())")
           Text(self.mission.description)
             .padding()
 
           ForEach(self.astronauts, id: \.role) {
             crewMember in
-            NavigationLink(destination: AstronautView(astronaut: crewMember.astronaut)) {
+            NavigationLink(destination: AstronautView(astronaut: crewMember.astronaut, missions: missions)) {
               HStack {
                 Image(crewMember.astronaut.id)
                   .resizable()
@@ -62,8 +64,9 @@ struct MissionView: View {
     .navigationBarTitle(Text(mission.displayName), displayMode: .inline)
   }
   
-  init(mission: Mission, astronauts: [Astronaut]) {
+  init(mission: Mission, astronauts: [Astronaut], missions: [Mission]) {
     self.mission = mission
+    self.missions = missions
     var matches = [CrewMember]()
     
     for member in mission.crew {
@@ -76,6 +79,16 @@ struct MissionView: View {
     
     self.astronauts = matches
   }
+  
+  func formattedLaunchDate() -> String {
+    if let launchDate = self.mission.launchDate {
+      let formatter = DateFormatter()
+      formatter.dateStyle = .long
+      return formatter.string(from: launchDate)
+    } else {
+      return String("N\\A")
+    }
+  }
 }
 
 struct MissionView_Previews: PreviewProvider {
@@ -84,7 +97,7 @@ struct MissionView_Previews: PreviewProvider {
   
   static var previews: some View {
     Group {
-      MissionView(mission: missions[1], astronauts: astronauts)
+      MissionView(mission: missions[1], astronauts: astronauts, missions: missions)
     }
       
   }
